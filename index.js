@@ -38,6 +38,13 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/allToys/:category", async (req, res) => {
+      const result = await toysCollection
+        .find({ toyCategory: req.params.category })
+        .toArray();
+      res.send(result);
+    });
+
     app.get("/getToysByText/:text", async (req, res) => {
       const text = req.params.text;
       const result = await toysCollection
@@ -89,7 +96,6 @@ async function run() {
       res.send(result);
     });
 
-    
     app.delete("/remove/:id", async (req, res) => {
       const result = await toysCollection.deleteOne({
         _id: new ObjectId(req.params.id),
