@@ -33,7 +33,7 @@ async function run() {
     const result = await toysCollection.createIndex(indexKeys, indexOptions);
 
     app.get("/allToys", async (req, res) => {
-      const cursor = toysCollection.find();
+      const cursor = toysCollection.find().limit(20);
       const result = await cursor.toArray();
       res.send(result);
     });
