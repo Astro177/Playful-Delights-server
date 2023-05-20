@@ -18,12 +18,20 @@ const client = new MongoClient(uri, {
     strict: true,
     deprecationErrors: true,
   },
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  maxPoolSize: 10,
 });
 
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    // await client.connect();
+    client.connect(() => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+    });
 
     const toysCollection = client.db("playfulDelights").collection("allToys");
 
@@ -115,9 +123,9 @@ async function run() {
 }
 run().catch(console.dir);
 
-app.get('/', (req, res) => {
-  res.send('toy server is running')
-})
+app.get("/", (req, res) => {
+  res.send("toy server is running");
+});
 
 app.listen(port, () => {
   console.log(`server is running on port ${port}`);
