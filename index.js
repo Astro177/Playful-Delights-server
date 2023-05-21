@@ -26,19 +26,15 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    client.connect(() => {
-      if (err) {
-        console.log(err);
-        return;
-      }
-    });
+    // client.connect(() => {
+    //   if (err) {
+    //     console.log(err);
+    //     return;
+    //   }
+    // });
 
     const toysCollection = client.db("playfulDelights").collection("allToys");
 
-    const indexKeys = { toyName: 1, toyCategory: 1 };
-    const indexOptions = { name: "nameCategory" };
-
-    const result = await toysCollection.createIndex(indexKeys, indexOptions);
 
     app.get("/allToys", async (req, res) => {
       const cursor = toysCollection.find().limit(20);
@@ -76,6 +72,32 @@ async function run() {
     app.get("/myToys/:email", async (req, res) => {
       const result = await toysCollection
         .find({ sellerEmail: req.params.email })
+        .toArray();
+      res.send(result);
+    });
+
+    app.get("/myToysHigh", async (req, res) => {
+      let query = {};
+      if (req.query?.sellerEmail) {
+        query = { sellerEmail: req.query.sellerEmail };
+      }
+      const result = await toysCollection
+        .find(query)
+        .sort({ price: -1 })
+        .collation({ locale: "en_US", numericOrdering: true })
+        .toArray();
+      res.send(result);
+    });
+
+    app.get("/myToysLow", async (req, res) => {
+      let query = {};
+      if (req.query?.sellerEmail) {
+        query = { sellerEmail: req.query.sellerEmail };
+      }
+      const result = await toysCollection
+        .find(query)
+        .sort({ price: 1 })
+        .collation({ locale: "en_US", numericOrdering: true })
         .toArray();
       res.send(result);
     });
